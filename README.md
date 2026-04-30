@@ -44,6 +44,7 @@ logdrift compare --baseline logs/v1.0/auth-service.log --current logs/v2.1/auth-
 | `--format` | Output format: `text` (default), `json`, `csv` |
 | `--strict` | Exit with non-zero code on any drift |
 | `--ignore` | Comma-separated list of fields to exclude |
+| `--sample` | Number of log lines to sample for schema inference (default: all) |
 
 Run `logdrift --help` for the full list of commands.
 
