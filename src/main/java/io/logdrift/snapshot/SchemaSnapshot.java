@@ -38,6 +38,17 @@ public class SchemaSnapshot {
         return capturedAt;
     }
 
+    /**
+     * Returns true if this snapshot was captured before the given instant.
+     *
+     * @param instant the instant to compare against
+     * @return true if this snapshot's capturedAt is before the given instant
+     */
+    public boolean isCapturedBefore(Instant instant) {
+        Objects.requireNonNull(instant, "instant must not be null");
+        return capturedAt.isBefore(instant);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
