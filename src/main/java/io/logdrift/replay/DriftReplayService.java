@@ -33,6 +33,7 @@ public class DriftReplayService {
      * @param from      start of replay window
      * @param to        end of replay window
      * @return ordered list of reconstructed drift events
+     * @throws IllegalArgumentException if {@code from} is not before {@code to}
      */
     public List<DriftReplayResult> replay(String serviceId, Instant from, Instant to) {
         Objects.requireNonNull(serviceId, "serviceId must not be null");
@@ -61,5 +62,34 @@ public class DriftReplayService {
      */
     public int countDriftTransitions(String serviceId, Instant from, Instant to) {
         return replay(serviceId, from, to).size();
+    }
+
+    /**
+     * Returns whether any drift occurred for the given service within the specified window.
+     * This is a convenience method equivalent to {@code countDriftTransitions(...) > 0},
+     * but avoids unnecessary result accumulation when only presence is needed.
+     *
+     * @param serviceId the microservice identifier
+     * @param from      start of replay window
+     * @param to        end of replay window
+     * @return {@code true} if at least one drift transition was detected
+     */
+    public boolean hasDriftInWindow(String serviceId, Instant from, Instant to) {
+        Objects.requireNonNull(serviceId, "serviceId must not be null");
+        Objects.requireNonNull(from, "from must not be null");
+        Objects.requireNonNull(to, "to must not be null");
+        if (!from.isBefore(to)) {
+            throw new IllegalArgumentException("'from' must be before 'to'");
+        }
+
+        List<SchemaSnapshot> snapshots = snapshotService.getSnapshotsInRange(serviceId, from, to);
+        for (int i = 1; i < snapshots.size(); i++) {
+            ComparisonResult comparison = comparator.compare(
+                    snapshots.get(i - 1).getSchema(), snapshots.get(i).getSchema());
+            if (comparison.hasDrift()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
