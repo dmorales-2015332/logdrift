@@ -45,6 +45,12 @@ class SchemaSnapshotTest {
     }
 
     @Test
+    void constructor_shouldThrowOnNullCapturedAt() {
+        assertThrows(NullPointerException.class,
+                () -> new SchemaSnapshot("svc", "v1", buildSchema(), null));
+    }
+
+    @Test
     void equals_shouldBeTrueForSameServiceVersionAndTime() {
         Instant now = Instant.now();
         SchemaSnapshot a = new SchemaSnapshot("svc", "v1", buildSchema(), now);
@@ -58,6 +64,14 @@ class SchemaSnapshotTest {
         Instant now = Instant.now();
         SchemaSnapshot a = new SchemaSnapshot("svc", "v1", buildSchema(), now);
         SchemaSnapshot b = new SchemaSnapshot("svc", "v2", buildSchema(), now);
+        assertNotEquals(a, b);
+    }
+
+    @Test
+    void equals_shouldBeFalseForDifferentServiceId() {
+        Instant now = Instant.now();
+        SchemaSnapshot a = new SchemaSnapshot("svc-a", "v1", buildSchema(), now);
+        SchemaSnapshot b = new SchemaSnapshot("svc-b", "v1", buildSchema(), now);
         assertNotEquals(a, b);
     }
 
