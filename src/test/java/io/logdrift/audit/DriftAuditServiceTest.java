@@ -86,6 +86,10 @@ class DriftAuditServiceTest {
         auditService.record("svc-a", "v1", List.of());
         auditService.record("svc-b", "v1", List.of());
 
-        assertEquals(2, auditService.getAllAuditLogs().size());
+        List<DriftAuditLog> all = auditService.getAllAuditLogs();
+
+        assertEquals(2, all.size());
+        assertTrue(all.stream().anyMatch(l -> l.getServiceId().equals("svc-a")));
+        assertTrue(all.stream().anyMatch(l -> l.getServiceId().equals("svc-b")));
     }
 }
