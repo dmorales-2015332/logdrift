@@ -21,6 +21,7 @@ public class DriftCheckpointStore {
     }
 
     public List<DriftCheckpoint> findByService(String serviceName) {
+        Objects.requireNonNull(serviceName, "serviceName must not be null");
         return store.values().stream()
                 .filter(c -> c.getServiceName().equals(serviceName))
                 .sorted(Comparator.comparing(DriftCheckpoint::getCreatedAt))
@@ -35,6 +36,19 @@ public class DriftCheckpointStore {
 
     public boolean delete(String id) {
         return store.remove(id) != null;
+    }
+
+    /**
+     * Returns the most recent checkpoint for the given service, based on creation time.
+     *
+     * @param serviceName the name of the service to look up
+     * @return an Optional containing the latest checkpoint, or empty if none exist
+     */
+    public Optional<DriftCheckpoint> findLatestByService(String serviceName) {
+        Objects.requireNonNull(serviceName, "serviceName must not be null");
+        return store.values().stream()
+                .filter(c -> c.getServiceName().equals(serviceName))
+                .max(Comparator.comparing(DriftCheckpoint::getCreatedAt));
     }
 
     public void clear() {
